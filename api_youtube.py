@@ -3,7 +3,7 @@ import pandas as pd
 import time
 import datetime
 
-"""#**Youtube video data extraction and loading to BigQuery**
+"""#**Youtube video data extraction and loading to Database**
 
 ## Extract Youtube data from the API
 """
