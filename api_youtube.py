@@ -8,7 +8,7 @@ import datetime
 ## Extract Youtube data from the API
 """
 
-api_key= 'AIzaSyDPfYQvBJq6-os2HddWMU-_qj4TwgLYC4I'
+api_key= '[Insert your API Key]'
 youtube=build('youtube','v3', developerKey=api_key)
 
 # Get a list of channel_ids from youtube
