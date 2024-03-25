@@ -8,43 +8,43 @@ import datetime
 ## Extract Youtube data from the API
 """
 
-api_key= '[Insert your API Key]'
-youtube=build('youtube','v3', developerKey=api_key)
+api_key = '[Insert your API Key]'
+youtube = build('youtube','v3', developerKey=api_key)
 
 # Get a list of channel_ids from youtube
 
 
-#Economia:
+# Monday set:
 set_1=['UCBLCvUUCiSqBCEc-TqZ9rGw',
        'UCZ4AMrDcNrfy3X6nsU8-rPg',
        'UC1tTYKft0v94eTqvS_ihJug',
        'UCkCGANrihzExmu9QiqZpPlQ']
 
-#Data
+# Tuesday set:
 set_2=['UC7cs8q-gJRlGwj4A8OmCmXg',
        'UCLLw7jmFsvfIVaUFsLs8mlQ',
        'UCW8Ews7tdKKkBT6GdtQaXvQ',
        'UCxladMszXan-jfgzyeIMyvw',
        'UC8butISFwT-Wl7EV0hUK0BQ']
 
-#Inversiones
+# Wednesday set:
 set_3=['UCCVIYA5kpLvEToE8Gj8Fszw',
        'UCvSXMi2LebwJEM1s4bz5IBA',
        'UCG8XPKMYb_nXtzmiPUoHMWg']
 
-#Historia
+# Thursday set:
 set_4=['UCMmaBzfCCwZ2KqaBJjkj0fw',
        'UCBIMW0ZhwULY_x7fdaPRPiQ']
 
-# Musica
+# Friday set:
 set_5=['UCN9HPn2fq-NL8M5_kp4RWZQ',
         ]
 
-#Entretenimiento
+# Saturday set:
 set_6=['UCxIBZ-nQhgZES3UaTm8eDPA',
        'UCCNgRIfWQKZyPkNvHEzPh7Q',]
 
-#Politica
+#Sunday set:
 set_7=['UCJQQVLyM6wtPleV4wFBK06g',
        'UChvUiqadVeBU-_xMi5el2Aw',
        'UCTqb7oZzCYpzOhPenq6AOyQ']
@@ -52,7 +52,7 @@ set_7=['UCJQQVLyM6wtPleV4wFBK06g',
 
 channel_ids=None
 
-# Obtener el día de la semana (0 es lunes, 6 es domingo)
+# Get the set we're using for the day the code is running:
 def get_set():
 
     today = datetime.datetime.today().weekday()
@@ -74,9 +74,9 @@ def get_set():
         channel_ids = set_7
     return channel_ids
 
-channel_ids=get_set()
+channel_ids = get_set()
 
-"""###Function to get channel statistics"""
+"""###Function to get channel data"""
 
 # Set a function to get the channel_id, channel name and statistical data:
 
@@ -87,24 +87,24 @@ def get_channel_data(youtube,channel_ids):
     response=request.execute()
 
     for i in response['items']:
-      data=dict(channel_name=i['snippet']['title'],
-              id_channel=i['id'],
-              view_count      =int(i['statistics']['viewCount']),
-              subscriber_count=int(i['statistics']['subscriberCount']),
-              video_count =int(i['statistics']['videoCount']),
-              date_created=i['snippet']['publishedAt'].split('T')[0])
+      data = dict(channel_name=i['snippet']['title'],
+              id_channel = i['id'],
+              view_count = int(i['statistics']['viewCount']),
+              subscriber_count = int(i['statistics']['subscriberCount']),
+              video_count = int(i['statistics']['videoCount']),
+              date_created = i['snippet']['publishedAt'].split('T')[0])
       all_data.append(data)
-      df=pd.DataFrame(all_data)
+      df = pd.DataFrame(all_data)
     return df
 
 
-#Execute the function declaring a variable channels_data:
+# Execute the function declaring a variable channels_data:
 channels=get_channel_data(youtube,channel_ids)
 
 
-"""### Function for Video IDs"""
+"""### Function to get Video IDs"""
 
-def get_video_ids(youtube,channel_ids):
+def get_video_ids(youtube, channel_ids):
 
 # Make a Function to get all videoIDs from a channel:
     def get_video_ids(youtube,channel_id):
@@ -113,96 +113,99 @@ def get_video_ids(youtube,channel_ids):
                                        channelId=channel_id,
                                        maxResults=50,
                                        order='date')
-       response=request.execute()
-       video_ids=[]
+       response = request.execute()
+       video_ids = []
 
        time.sleep(1)
 
     #Get video_IDs with a For loop to append it to video_ids list:
        for video in response['items']:
-            if video['id']['kind']=='youtube#video':
-                video_id= video['id']['videoId']
+            if video['id']['kind'] == 'youtube#video':
+                video_id = video['id']['videoId']
                 video_ids.append(video_id)
 
 
-     #Make the pagination in order to get all the results for the query:
-       next_page_token=response.get('nextPageToken')
-       more_pages=True
+     # Make the pagination in order to get all the results for the query:
+       next_page_token = response.get('nextPageToken')
+       more_pages = True
 
        while more_pages:
            if next_page_token is None:
-             more_pages=False
+             more_pages = False
            else:
                request = youtube.search().list(part='snippet,id',
                                             channelId=channel_id,
                                             maxResults=50,
                                             order='date',
                                             pageToken=next_page_token)
-               response=request.execute()
+               response = request.execute()
 
                for video in response['items']:
-                 if video['id']['kind']=='youtube#video':
-                     video_id= video['id']['videoId']
+                 if video['id']['kind'] == 'youtube#video':
+                     video_id = video['id']['videoId']
                      video_ids.append(video_id)
 
-               next_page_token=response.get('nextPageToken')
+               next_page_token = response.get('nextPageToken')
 
        return video_ids
-    video_ids_list=[]
+           
+    video_ids_list = []
 
     for channel_id in channel_ids:
-      video_ids_list.extend(get_video_ids(youtube,channel_id))
+      video_ids_list.extend(get_video_ids(youtube, channel_id))
 
     return video_ids_list
 
-video_ids=get_video_ids(youtube,channel_ids)
+video_ids = get_video_ids(youtube, channel_ids)
 
 """###Function for video details"""
 
 #Set a function to get video details from the video_ids list:
 def get_video_details(youtube,video_ids):
 
-  all_videos=[]
-  for i in range(0,len(video_ids),50):
-    request = youtube.videos().list(part='snippet,id,statistics',
+  all_videos = []
+  for i in range(0, len(video_ids), 50):
+    request = youtube.videos().list(part='snippet, id, statistics',
                                          id=','.join(video_ids[i:i+50]))
-    response=request.execute()
+    response = request.execute()
 
     for video in response['items']:
-        videos=dict(channel_name  =video['snippet']['channelTitle'],
-                    video_title   =video['snippet']['title'],
-                    video_id      =video['id'],
-                    date_published=video['snippet']['publishedAt'].split('T')[0],
+        videos = dict(channel_name  =video['snippet']['channelTitle'],
+                    video_title = video['snippet']['title'],
+                    video_id = video['id'],
+                    date_published = video['snippet']['publishedAt'].split('T')[0],
                     viewcount     =int(video['statistics'].get('viewCount',0)),
                     likecount     =int(video['statistics'].get('likeCount',0)),
                     commentcount  =int(video['statistics'].get('commentCount',0)))
         all_videos.append(videos)
 
 #Convert results into a dataframe:
-        df=pd.DataFrame(all_videos)
+        df = pd.DataFrame(all_videos)
 
   return df
 
-videos=get_video_details(youtube,video_ids)
+videos = get_video_details(youtube, video_ids)
 
 
 
-"""# Load to AWS Database"""
+"""# Load Data to Database"""
 
-#!pip install psycopg2
+
 
 import psycopg2 as ps
 
 
+# Introduce all database required data:
 
-endpoint='localhost'
-dbname= 'youtube_local'
-port='5432'
-user='postgres'
-password='aure0006'
+endpoint='[Database endpoint]'
+dbname= '[Database name]'
+port='[Port]'
+user='[Database username]'
+password='[Database password]'
 
 conn=None
 
+# Stablish connection whith database:
 def conect_to_db(endpoint,dbname,user,password,port):
     try:
         conn=ps.connect(host=endpoint,database=dbname,user=user,password=password,port=port)
@@ -210,41 +213,44 @@ def conect_to_db(endpoint,dbname,user,password,port):
     except ps.OperationalError as e:
       raise e
     else:
-      print('conectado')
+      print('Connection stablished succesfully.')
     return conn
     
 conn=conect_to_db(endpoint,dbname,user,password,port)
 
+
 #Create table for videos
 def create_table_videos(curr):
 
-     create_table_command=(
+     create_table_command = (
             ''' CREATE TABLE IF NOT EXISTS videos (
             channel_name    VARCHAR(255) NOT NULL ,
-            video_title	    TEXT NOT NULL,
-            video_id	      VARCHAR(255) PRIMARY KEY,
+            video_title	TEXT NOT NULL,
+            video_id	       VARCHAR(255) PRIMARY KEY,
             date_published	DATE NOT NULL DEFAULT CURRENT_DATE,
-            viewcount	      BIGINT  NOT NULL,
-            likecount	      INTEGER NOT NULL,
+            viewcount	BIGINT  NOT NULL,
+            likecount	INTEGER NOT NULL,
             commentcount    INTEGER NOT NULL
             )
             ''')
      curr.execute(create_table_command)
 
+# Create table for the channels:
 def create_table_channels(curr):
 
-     create_table_command=(
+     create_table_command = (
             ''' CREATE TABLE IF NOT EXISTS channels (
-            channel_name    VARCHAR(255) NOT NULL ,
-            id_channel	      VARCHAR(255) PRIMARY KEY,
-            view_count	      BIGINT  NOT NULL,
-            subscriber_count	    INTEGER  NOT NULL,
-            video_count	      INTEGER NOT NULL,
-            date_created	    DATE NOT NULL DEFAULT CURRENT_DATE
+            channel_name     VARCHAR(255) NOT NULL ,
+            id_channel	 VARCHAR(255) PRIMARY KEY,
+            view_count	 BIGINT  NOT NULL,
+            subscriber_count INTEGER  NOT NULL,
+            video_count	 INTEGER NOT NULL,
+            date_created	 DATE NOT NULL DEFAULT CURRENT_DATE
             )
             ''')
      curr.execute(create_table_command)
 
+# Functions to check if a video or channel in the set already exists:
 def check_if_video_exists(curr,video_id):
 
     query=('''
@@ -261,58 +267,62 @@ def check_if_channel_exists(curr,id_channel):
     curr.execute(query,(id_channel,))
     return curr.fetchone() is not None
 
-def update_videos(curr,channel_name,video_title,video_id,date_published,viewcount,likecount,commentcount):
+# Functions to update the channels and videos table:
+
+def update_videos(curr, channel_name, video_title, video_id, date_published, viewcount, likecount, commentcount):
   query=('''UPDATE videos
   SET channel_name = %s,
-  video_title	  = %s,
-  date_published= %s,
-  viewcount	    = %s,
-  likecount	    = %s,
-  commentcount  = %s
-  WHERE video_id= %s;
+  video_title	     = %s,
+  date_published   = %s,
+  viewcount	     = %s,
+  likecount	     = %s,
+  commentcount     = %s
+  WHERE video_id   = %s;
   ''')
 
-  vars_to_update= (	channel_name,video_title,date_published,viewcount,likecount,commentcount,video_id)
-  curr.execute(query,vars_to_update)
+  vars_to_update = (channel_name, video_title, date_published, viewcount, likecount, commentcount, video_id)
+  curr.execute(query, vars_to_update)
 
-def update_channels(curr,channel_name,	id_channel,view_count,subscriber_count,video_count,date_created):
+def update_channels(curr, channel_name, id_channel, view_count, subscriber_count, video_count, date_created):
   query=('''UPDATE channels
   SET channel_name = %s,
-  view_count	  = %s,
-  subscriber_count= %s,
-  video_count	    = %s,
-  date_created	    = %s
-  WHERE id_channel= %s;
+  view_count	     = %s,
+  subscriber_count = %s,
+  video_count	     = %s,
+  date_created     = %s
+  WHERE id_channel = %s;
   ''')
-  vars_to_update= (channel_name,view_count,subscriber_count,video_count,date_created,id_channel)
+  vars_to_update = (channel_name, view_count, subscriber_count, video_count, date_created, id_channel)
   curr.execute(query,vars_to_update)
 
-#updating the database
-#handling data for scalability
+# Updating the database and handling data for scalability
 
 def update_db_videos(curr,df):
-    tmp_df=pd.DataFrame(columns=['channel_name','video_title','video_id','date_published','viewcount','likecount','commentcount'])
+    tmp_df=pd.DataFrame(columns = ['channel_name','video_title',
+                                   'video_id','date_published',
+                                   'viewcount','likecount','commentcount'])
 
     #check to see if video exists
 
     for i, row in df.iterrows():
-      if check_if_video_exists(curr,row['video_id']): #if vedeo exists, update
-        update_videos(curr,row['channel_name'],row['video_title'],row['video_id'],row['date_published'],row['viewcount'],row['likecount'],row['commentcount'])
-      else: #if not, append to the DataFrame
+      if check_if_video_exists(curr, row['video_id']): # if video exists, update
+        update_videos(curr,row['channel_name'],row['video_title'],
+                      row['video_id'],row['date_published'],
+                      row['viewcount'],row['likecount'],row['commentcount'])
+             
+      else: # if not, append to the DataFrame
         tmp_df = pd.concat([tmp_df,pd.DataFrame([row],columns=tmp_df.columns)])
-
 
     return tmp_df
 
 
 
 def update_db_channels(curr,df):
-    tmp_df=pd.DataFrame(columns=['channel_name','id_channel','view_count','subscriber_count','video_count','date_created'])
-
-    #check to see if video exists
+    tmp_df=pd.DataFrame(columns=['channel_name', 'id_channel', 'view_count',
+                                 'subscriber_count', 'video_count', 'date_created'])
 
     for i, row in df.iterrows():
-      if check_if_channel_exists(curr,row['id_channel']): #if vedeo exists, update
+      if check_if_channel_exists(curr,row['id_channel']): #if channel exists, update
         update_channels(curr,row['channel_name'],row['id_channel'],row['view_count'],row['subscriber_count'],row['video_count'],row['date_created'])
       else: #if not, append to the DataFrame
         tmp_df = pd.concat([tmp_df,pd.DataFrame([row],columns=tmp_df.columns)])
@@ -320,7 +330,7 @@ def update_db_channels(curr,df):
 
     return tmp_df
 
-#perform update on exixting videos
+# Perform update on exixting videos
 
 def insert_into_videos(curr,channel_name,video_title,video_id,date_published,viewcount,likecount,commentcount):
 
@@ -341,7 +351,7 @@ def insert_into_videos(curr,channel_name,video_title,video_id,date_published,vie
 
 
 
-#perform update on exixting channels
+# Perform update on exixting channels
 def insert_into_channels(curr,channel_name,id_channel,view_count,subscriber_count,video_count,date_created):
 
     insert_into_channels= ('''
@@ -357,36 +367,37 @@ def insert_into_channels(curr,channel_name,id_channel,view_count,subscriber_coun
     rows_to_insert=(channel_name,id_channel,view_count,subscriber_count,video_count,date_created)
     curr.execute(insert_into_channels,rows_to_insert)
 
-def append_from_df_to_videos(curr,df):
+def append_from_df_to_videos(curr, df):
     for i,row in df.iterrows():
-      insert_into_videos(curr,row['channel_name'],row['video_title'],row['video_id'],row['date_published'],row['viewcount'],row['likecount'],row['commentcount'])
+      insert_into_videos(curr, row['channel_name'], row['video_title'],
+                         row['video_id'],row['date_published'],
+                         row['viewcount'],row['likecount'],row['commentcount'])
 
 
 
 
 def append_from_df_to_channels(curr,df):
     for i,row in df.iterrows():
-      insert_into_channels(curr,row['channel_name'],row['id_channel'],row['view_count'],row['subscriber_count'],row['video_count'],row['date_created'])
+      insert_into_channels(curr,row['channel_name'],row['id_channel'],
+                           row['view_count'],row['subscriber_count'],
+                           row['video_count'],row['date_created'])
 
-#Create the cursor
+# Create the cursor
 curr=conn.cursor()
 
 create_table_videos(curr)
 create_table_channels(curr)
 
-new_vid_df=update_db_videos(curr,videos)
-new_chan_df=update_db_channels(curr,channels)
+new_vid_df=update_db_videos(curr, videos)
+new_chan_df=update_db_channels(curr, channels)
 
-append_from_df_to_videos(curr,new_vid_df)
-append_from_df_to_channels(curr,new_chan_df)
+append_from_df_to_videos(curr, new_vid_df)
+append_from_df_to_channels(curr, new_chan_df)
 
-#Commit commands to the DB
+# Commit commands to the DB
 conn.commit()
 
 #Close connection
 
 curr.close()
 conn.close()
-
-
-#display(channels)
