@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repository contains a script designed to interface with the YouTube API to extract data about channels and videos, perform data cleaning, and subsequently upload the information to a PostgreSQL database. The script is structured to circumvent the YouTube API's daily request limit by rotating through seven different sets of channels, each corresponding to a day of the week. This ensures a diverse range of data is collected without exceeding the API's constraints.
+This repository contains a script designed to interface with the YouTube API to extract data about channels and videos, perform data cleaning, and subsequently upload the information to a PostgreSQL database. The script is structured to circumvent the YouTube API's daily request limit by rotating through seven different sets of channels, each corresponding to a day of the week. This ensures a diverse range of data is collected without exceeding the API's constraints. 
 
 ## Features
 
