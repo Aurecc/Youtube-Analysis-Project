@@ -41,7 +41,7 @@ Contributions are welcome. If you would like to improve the script or add new fe
 
 ## References
 
-1. "Working with APIs in Python" - StrataScratch - [https://www.youtube.com/watch?v=iv8rSLsi1xo](https://www.youtube.com/watch?v=fklHBWow8vE&t=1s)
-2. "Importing a Pandas Dataframe to a Database in Python" - StrataScratch - [https://www.youtube.com/watch?v=0fKg7e37bQE](https://www.youtube.com/watch?v=77IVf0zgmwI)
-3. Python Project to Scrape YouTube using YouTube Data API | Analyze and Visualize YouTube data" - techTFQ - [https://www.youtube.com/watch?v=xuB1Id2Wxak](https://www.youtube.com/watch?v=SwSbnmqk3zY&t=3635s)
+1. "Working with APIs in Python" - StrataScratch - [Link](https://www.youtube.com/watch?v=fklHBWow8vE&t=1s)
+2. "Importing a Pandas Dataframe to a Database in Python" - StrataScratch - [Link](https://www.youtube.com/watch?v=77IVf0zgmwI)
+3. Python Project to Scrape YouTube using YouTube Data API | Analyze and Visualize YouTube data" - techTFQ - [Link](https://www.youtube.com/watch?v=SwSbnmqk3zY&t=3635s)
 
