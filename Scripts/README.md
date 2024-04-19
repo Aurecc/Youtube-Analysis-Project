@@ -28,7 +28,7 @@ This repository contains a script designed to interface with the YouTube API to 
 1. Clone this repository to your local machine.
 2. Ensure that you have set up your PostgreSQL database with the appropriate user permissions.
 3. Enter your YouTube API key and PostgreSQL database credentials in the designated areas within the script.
-4. Run the script youtube_data_extraction.py using Python on the appropriate day to target the set of channels designated for that weekday.
+4. Run the script *youtube_data_load.py* using Python on the appropriate day to target the set of channels designated for that weekday.
 5. The script will handle all phases of data extraction, cleaning, and uploading automatically.
 
 ## Notes
