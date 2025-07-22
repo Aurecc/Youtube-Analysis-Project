@@ -1,4 +1,4 @@
-# YouTube Data Extraction and Analysis Project
+# YouTube Data ETL Project
 
 ## Project Description
 This project aims to extract data from the YouTube API using Python, load it into a PostgreSQL database.
